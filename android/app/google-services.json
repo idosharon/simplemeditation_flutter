@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "938689466374",
+    "firebase_url": "https://meditationapp-e32dd.firebaseio.com",
+    "project_id": "meditationapp-e32dd",
+    "storage_bucket": "meditationapp-e32dd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938689466374:android:9c0f6c1eb9586133",
+        "android_client_info": {
+          "package_name": "com.example.amzingwidget"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "938689466374-vd8ulc31smmurt5std0oljimp02hhk2b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-Z7DHj28zlp8A7tu7rWGKa58sSGZc2Y4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
