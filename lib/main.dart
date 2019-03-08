@@ -4,12 +4,19 @@ import 'dart:convert';
 import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:splashscreen/splashscreen.dart';
+import 'package:flutter_keepscreenon/flutter_keepscreenon.dart';
+import 'package:share/share.dart';
+
+//global vars
+String songfile = "gong1.mp3";
+AudioCache Gong = new AudioCache();
+int latesI = 1260;
+bool working = false;
+int mypoints = 0;
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: logo,
+        title: Center(child: logo,),
         backgroundColor: Colors.white,
         elevation: 0,
 
@@ -67,7 +74,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      _selected = index;
+      if(!working) {
+        _selected = index;
+      } else {
+
+      }
     });
   }
 }
@@ -81,28 +92,76 @@ class SettingPage extends State<_SettingPage> {
   @override
   Widget build(context) {
     return new Center(
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("About", style: TextStyle(fontWeight: FontWeight.bold),),
-              Text("This app created by Ido Sharon.")
-            ],
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: <Widget>[
+          Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("About", style: TextStyle(fontWeight: FontWeight.bold),),
+                Text("This app created by Ido Sharon."),
+              ],
+            ),
+            height: 90,
+            width: 400,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                new BoxShadow(
+                  color: Colors.indigo[50],
+                  blurRadius: 5,
+                  offset: Offset(0, 0),
+                )
+              ],
+              borderRadius: BorderRadius.circular(borderradius),
+            ),
           ),
-          height: 90,
-          width: 400,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              new BoxShadow(
-                color: Colors.indigo[50],
-                blurRadius: 5,
-                offset: Offset(0, 0),
-              )
-            ],
-            borderRadius: BorderRadius.circular(borderradius),
+          Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text("Gong Sounds",style: TextStyle(fontWeight: FontWeight.bold)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    FloatingActionButton(onPressed: () {
+                      songfile = "gong1.mp3";
+                      Gong.play(songfile);
+                    }, elevation: 0, backgroundColor: Colors.white, child: Text("1",style: TextStyle(color: Theme.of(context).primaryColor))),
+                    FloatingActionButton(onPressed: () {
+                      songfile = "gong2.mp3";
+                      Gong.play(songfile);
+                    }, elevation: 0, backgroundColor: Colors.white, child: Text("2",style: TextStyle(color: Theme.of(context).primaryColor))),
+                    FloatingActionButton(onPressed: () {
+                      songfile = "gong3.mp3";
+                      Gong.play(songfile);
+                    }, elevation: 0, backgroundColor: Colors.white, child: Text("3",style: TextStyle(color: Theme.of(context).primaryColor))),
+                    FloatingActionButton(onPressed: () {
+                      songfile = "gong4.mp3";
+                      Gong.play(songfile);
+                    }, elevation: 0, backgroundColor: Colors.white, child: Text("4",style: TextStyle(color: Theme.of(context).primaryColor))),
+                  ],
+                )
+              ],
+            ),
+            height: 90,
+            width: 400,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                new BoxShadow(
+                  color: Colors.indigo[50],
+                  blurRadius: 5,
+                  offset: Offset(0, 0),
+                )
+              ],
+              borderRadius: BorderRadius.circular(borderradius),
+            ),
           ),
-        )
+        ],
+      )
+
     );
   }
 }
@@ -114,53 +173,50 @@ class _HomePage extends StatefulWidget {
 
 class HomeScreen extends State<_HomePage> {
   //api start
-  String quote;
-  String auther;
+  String quote = "Loading...";
+  String quoteauther = "Loading...";
 
   @override
   void initState() {
     super.initState();
     getData();
+    FlutterKeepscreenon.keepScreenOn(true);
   }
 
   Future getData() async {
     http.Response response = await http.get(
-        Uri.encodeFull("https://thesimpsonsquoteapi.glitch.me/quotes"),
+        Uri.encodeFull("https://quotes.rest/qod.json"),
         headers: {
           "Accept": "application/json",
+          "content-type": "application/json"
         }
     );
 
     final data = jsonDecode(response.body);
 
-    quote = data[0]["quote"];
-    auther = data[0]["character"];
+    quote = data["contents"]["quotes"][0]["quote"];
+    quoteauther = data["contents"]["quotes"][0]["author"];
 
-    print(quote);
-    if(quote.length > 100) {
-      getData();
-    } else {
-      setState(() {
-        quote;
-        auther;
-      });
-    }
+    print("quote: " + quote);
+    setState(() {
+      quote.toString();
+      quoteauther.toString();
+    });
 
   }
-  
-  //meditation timer :
-  String songfile = "gong1.mp3";
+  //api end
+
+  //points!!!
+  //vars
+
+  //meditation timer
   int ender = 0;
-  int latesI = 21;
   int timerDowner = 1;
-  static AudioCache Gong = new AudioCache();
 
 
   int sec;
-  int i = 21;
+  int i = latesI;
   int hours;
-
-  bool working = false;
 
   var timer;
 
@@ -169,8 +225,8 @@ class HomeScreen extends State<_HomePage> {
       reset();
     } else {
       timer = new Timer.periodic(Duration(seconds: timerDowner), callback);
-      i = i * 60;
     }
+
   }
 
   void reset() {
@@ -195,7 +251,6 @@ class HomeScreen extends State<_HomePage> {
   void startSound() {
     if(working) return;
     Gong.play(songfile);
-
   }
   void Sound2() {
     Gong.play(songfile);
@@ -208,8 +263,24 @@ class HomeScreen extends State<_HomePage> {
     if(i == ender){
       print("End");
       Gong.play(songfile);
+      setState(() {
+
+      });
       Future.delayed(Duration(milliseconds: 1500), Sound2);
       setState(() {
+        switch(latesI) {
+          case 60: mypoints++;
+          break;
+          case 420: mypoints += 7;
+          break;
+          case 1260: mypoints += 21;
+          break;
+          case 2520: mypoints += 42;
+          break;
+          case 3780: mypoints += 63;
+          break;
+        }
+
         this.i = latesI;
         timer.cancel();
       });
@@ -224,7 +295,7 @@ class HomeScreen extends State<_HomePage> {
 
   }
 
-  //widget
+
 
   @override
   Widget build(context) {
@@ -241,19 +312,20 @@ class HomeScreen extends State<_HomePage> {
                     if (working) return;
                       Gong.play(songfile);
                       setState(() {
-                        this.i = {42: 63, 63: 1, 1: 7, 7: 21, 21: 42}[this.i];
+                        this.i = {2520: 3780, 3780: 60, 60: 420, 420: 1260, 1260: 2520}[this.i];
                         latesI = this.i;
                     });
                   },
                   child: Container(
                     width: 1000,
-                    height: 370,
+                    height: 600,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        Text("$i",style: TextStyle(fontSize: 70,fontWeight: FontWeight.bold, color: Colors.white)),
+                        Text(((i/60).floor()).toString().padLeft(2,'0') + ":" + (i%60).toString().padLeft(2,'0'),style: TextStyle(fontSize: 70,fontWeight: FontWeight.bold, color: Colors.white)),
                         RaisedButton(
                           onPressed: () {
+
                             StartTimer();
                             startSound();
                           },
@@ -287,40 +359,67 @@ class HomeScreen extends State<_HomePage> {
                 ),
               ),
               Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.all(20),
-                        child: Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 10,top: 10,right: 10),
+                      child: Container(
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text("Bowl Sound",style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),),
+                              Text("The Daily quote\n",style: TextStyle(fontWeight: FontWeight.bold)),
+                              Text(quote.toString(),style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),textAlign: TextAlign.center,),
+                              Text(quoteauther.toString(), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
-                                  FloatingActionButton(onPressed: () {
-                                    songfile = "gong1.mp3";
-                                    Gong.play(songfile);
-                                  }, elevation: 0, backgroundColor: Colors.white, child: Text("1",style: TextStyle(color: Theme.of(context).primaryColor))),
-                                  FloatingActionButton(onPressed: () {
-                                    songfile = "gong2.mp3";
-                                    Gong.play(songfile);
-                                  }, elevation: 0, backgroundColor: Colors.white, child: Text("2",style: TextStyle(color: Theme.of(context).primaryColor))),
-                                  FloatingActionButton(onPressed: () {
-                                    songfile = "gong3.mp3";
-                                    Gong.play(songfile);
-                                  }, elevation: 0, backgroundColor: Colors.white, child: Text("3",style: TextStyle(color: Theme.of(context).primaryColor))),
-                                  FloatingActionButton(onPressed: () {
-                                    songfile = "gong4.mp3";
-                                    Gong.play(songfile);
-                                  }, elevation: 0, backgroundColor: Colors.white, child: Text("4",style: TextStyle(color: Theme.of(context).primaryColor))),
+                                  IconButton(
+                                    onPressed: () {
+                                      startSound();
+                                      Share.share("Check out this quote - '" + quote.toString() + "' His Auther is - " + quoteauther.toString());
+                                    },
+                                    color: Theme.of(context).primaryColor,
+                                    icon: Icon(Icons.share),
+                                    splashColor: Colors.transparent,
+                                  ),
                                 ],
                               )
+
                             ],
                           ),
-                          height: 90,
+                        ),
+                        width: 400,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            new BoxShadow(
+                              color: Colors.indigo[50],
+                              blurRadius: 5,
+                              offset: Offset(0, 0),
+                            )
+                          ],
+                          borderRadius: BorderRadius.circular(
+                              borderradius),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: Container(
+                          child: Padding(
+                            padding: EdgeInsets.all(10),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("Experience Points\n",style: TextStyle(fontWeight: FontWeight.bold)),
+                                Text(mypoints.toString(),style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor),textAlign: TextAlign.center,),
+                              ],
+                            ),
+                          ),
                           width: 400,
                           decoration: BoxDecoration(
                             color: Colors.white,
@@ -331,51 +430,14 @@ class HomeScreen extends State<_HomePage> {
                                 offset: Offset(0, 0),
                               )
                             ],
-                            borderRadius: BorderRadius.circular(borderradius),
+                            borderRadius: BorderRadius.circular(
+                                borderradius),
                           ),
                         ),
                       ),
-                      Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                                left: 20, right: 20, bottom: 20),
-                            child: Container(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text("Simpsons quotes to make you laugh!\n",style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),),
-                                  Text('"' + quote.toString() + '"',style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor),textAlign: TextAlign.center,),
-                                  Text(auther.toString(),style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),textAlign: TextAlign.center,),
-                                  RaisedButton(
-                                    onPressed: () {
-                                      getData();
-                                      startSound();
-                                    },
-                                    color: Colors.white,
-                                    child: Icon(Icons.refresh),
-                                    elevation: 0,
-                                    splashColor: Colors.indigo[100],
-                                  ),
-                                ],
-                              ),
-                              width: 400,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                boxShadow: [
-                                  new BoxShadow(
-                                    color: Colors.indigo[50],
-                                    blurRadius: 5,
-                                    offset: Offset(0, 0),
-                                  )
-                                ],
-                                borderRadius: BorderRadius.circular(
-                                    borderradius),
-                              ),
-                            ),
-                          )
-                      )
-                    ],
-                  )
+                    )
+                  ],
+                )
               ),
             ],
           ),
