@@ -177,10 +177,18 @@ class HomeScreen extends State<_HomePage> {
 
   loadLocalStorage() async {
     final prefs = await SharedPreferences.getInstance();
+
     setState(() {
-      i = prefs.getInt("i");
+      if(prefs.getInt("i") == null) {
+        addIntToLocalStorage("i", latesI);
+        i = latesI;
+      } else {
+        i = prefs.getInt("i");
+      }
     });
-    if(prefs.getInt("points") == 0){
+
+
+    if(prefs.getInt("points") != null){
       setState(() {
         mypoints = prefs.getInt("points");
         coins = mypoints/2;
@@ -188,7 +196,7 @@ class HomeScreen extends State<_HomePage> {
     } else {
       setState(() {
         addIntToLocalStorage("points", 0);
-        mypoints = prefs.getInt("points");
+        mypoints = 0;
         coins = mypoints/2;
       });
     }
@@ -281,39 +289,39 @@ class HomeScreen extends State<_HomePage> {
   }
 
   void callback(Timer timer) async {
+    final prefs = await SharedPreferences.getInstance();
     if (i == ender) {
       print("End");
       gong.play(songfile);
       Future.delayed(Duration(milliseconds: 1500), sound2);
 
       setState(() {
-        switch (latesI) {
+        this.i = prefs.getInt("i");
+
+        switch (prefs.getInt("i")) {
           case 60:
             mypoints++;
+            addIntToLocalStorage("points", mypoints);
             break;
           case 420:
             mypoints += 7;
+            addIntToLocalStorage("points", mypoints);
             break;
           case 1260:
             mypoints += 21;
+            addIntToLocalStorage("points", mypoints);
             break;
           case 2520:
             mypoints += 42;
+            addIntToLocalStorage("points", mypoints);
             break;
           case 3780:
             mypoints += 63;
+            addIntToLocalStorage("points", mypoints);
             break;
         }
 
-
-        //add to localstorage
-        addIntToLocalStorage("points", mypoints);
-
-        setState(() {
-          coins = mypoints / 2;
-        });
-
-        this.i = latesI;
+        coins = mypoints/2;
 
         timer.cancel();
       });
@@ -407,10 +415,10 @@ class HomeScreen extends State<_HomePage> {
                       card(Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Text("\nThe Daily quote\n", style: TextStyle(
+                          Text("\nRandom Inspire quote\n", style: TextStyle(
                               fontWeight: FontWeight.bold)),
                           Text(quote.toString(), style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: Theme
                                   .of(context)
@@ -432,7 +440,7 @@ class HomeScreen extends State<_HomePage> {
                                       "Check out this quote - '" +
                                           quote.toString() +
                                           "' His Auther is - " +
-                                          quoteauther.toString());
+                                          quoteauther.toString())
                                 },
                                 color: Theme
                                     .of(context)
@@ -497,7 +505,7 @@ class HomeScreen extends State<_HomePage> {
 
   Widget card(Widget child, double width) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: EdgeInsets.all(4),
       child: Container(
         child: Center(
           child: Padding(
