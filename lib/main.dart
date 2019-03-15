@@ -9,13 +9,26 @@ import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
-//global vars
 String songfile = "gong1.mp3";
 AudioCache gong = new AudioCache();
 int latesI = 1260;
 bool working = false;
 int mypoints = 0;
-double coins = mypoints/2;
+
+addIntToLocalStorage(String name, int value) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setInt(name, value);
+}
+
+addStringToLocalStorage(String name, String value) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString(name, value);
+}
+
+addDoubleToLocalStorage(String name, double value) async {
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setDouble(name, value);
+}
 
 Map<int, Color> color =
 {
@@ -51,9 +64,6 @@ class MyApp extends StatelessWidget {
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
-
-
-
 }
 
 class MyHomePage extends StatefulWidget {
@@ -65,74 +75,64 @@ class MyHomePage extends StatefulWidget {
 
 double borderradius = 10;
 
-
 class _MyHomePageState extends State<MyHomePage> {
 
-
   static var logoImage = new AssetImage('assets/logo.png');
-  var logo = new Image(image: logoImage, width: 43, height:  43,);
+  var logo = new ImageIcon(logoImage, color: colorCustom, size: 60,);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
+        centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        title: Center(child: logo),
-        leading: IconButton(icon: Icon(Icons.info), color: Theme.of(context).primaryColor,onPressed: () => _showDialog("About SimpleMind",
-            Column(
+        title: IconButton(icon: logo, onPressed: () => _showDialog("Settings", Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text("gong Sound\n",style: TextStyle(fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                Text("This App created by Ido Sharon")
+                FloatingActionButton(onPressed: () {
+                  songfile = "gong1.mp3";
+                  gong.play(songfile);
+                  addStringToLocalStorage("gongfile", songfile);
+                }, elevation: 0, backgroundColor: Colors.white, child: Text("1",style: TextStyle(color: Theme.of(context).primaryColor))),
+                FloatingActionButton(onPressed: () {
+                  songfile = "gong2.mp3";
+                  gong.play(songfile);
+                  addStringToLocalStorage("gongfile", songfile);
+                }, elevation: 0, backgroundColor: Colors.white, child: Text("2",style: TextStyle(color: Theme.of(context).primaryColor))),
+                FloatingActionButton(onPressed: () {
+                  songfile = "gong3.mp3";
+                  gong.play(songfile);
+                  addStringToLocalStorage("gongfile", songfile);
+                }, elevation: 0, backgroundColor: Colors.white, child: Text("3",style: TextStyle(color: Theme.of(context).primaryColor))),
+                FloatingActionButton(onPressed: () {
+                  songfile = "gong4.mp3";
+                  gong.play(songfile);
+                  addStringToLocalStorage("gongfile", songfile);
+                }, elevation: 0, backgroundColor: Colors.white, child: Text("4",style: TextStyle(color: Theme.of(context).primaryColor))),
               ],
             )
-            , "Cool"),),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.settings), color: Theme.of(context).primaryColor,onPressed: () => _showDialog("Settings", Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text("gong Sound\n",style: TextStyle(fontWeight: FontWeight.bold)),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  FloatingActionButton(onPressed: () {
-                    songfile = "gong1.mp3";
-                    gong.play(songfile);
-                  }, elevation: 0, backgroundColor: Colors.white, child: Text("1",style: TextStyle(color: Theme.of(context).primaryColor))),
-                  FloatingActionButton(onPressed: () {
-                    songfile = "gong2.mp3";
-                    gong.play(songfile);
-                  }, elevation: 0, backgroundColor: Colors.white, child: Text("2",style: TextStyle(color: Theme.of(context).primaryColor))),
-                  FloatingActionButton(onPressed: () {
-                    songfile = "gong3.mp3";
-                    gong.play(songfile);
-                  }, elevation: 0, backgroundColor: Colors.white, child: Text("3",style: TextStyle(color: Theme.of(context).primaryColor))),
-                  FloatingActionButton(onPressed: () {
-                    songfile = "gong4.mp3";
-                    gong.play(songfile);
-                  }, elevation: 0, backgroundColor: Colors.white, child: Text("4",style: TextStyle(color: Theme.of(context).primaryColor))),
-                ],
-              )
-            ],
-          ) ,"Ok"),)
-        ],
+          ],
+        ) ,"Ok")),
       ),
       body: _HomePage(),
     );
   }
 
   Widget _showDialog(String title, Widget content, String Buttonstring) {
-    // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return object of type Dialog
         return AlertDialog(
           title: new Text(title),
           content: content,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(borderradius))),
           actions: <Widget>[
-            // usually buttons at the bottom of the dialog
             new FlatButton(
               child: new Text(Buttonstring),
               onPressed: () {
@@ -152,29 +152,6 @@ class _HomePage extends StatefulWidget {
 }
 
 class HomeScreen extends State<_HomePage> {
-  //alert
-
-  //localStorage Fun
-  //add
-  addIntToLocalStorage(String name, int value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setInt(name, value);
-  }
-
-  addStringToLocalStorage(String name, String value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setString(name, value);
-  }
-
-  addDoubleToLocalStorage(String name, double value) async {
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setDouble(name, value);
-  }
-
-  //api start
-  String quote = "Loading...";
-  String quoteauther = "Loading...";
-
   loadLocalStorage() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -187,20 +164,25 @@ class HomeScreen extends State<_HomePage> {
       }
     });
 
+    setState(() {
+      if(prefs.getString("gongfile") == null){
+        addStringToLocalStorage("gongfile", "songfile.mp3");
+      } else {
+        songfile = prefs.getString("gongfile");
+      }
+    });
+
 
     if(prefs.getInt("points") != null){
       setState(() {
         mypoints = prefs.getInt("points");
-        coins = mypoints/2;
       });
     } else {
       setState(() {
         addIntToLocalStorage("points", 0);
         mypoints = 0;
-        coins = mypoints/2;
       });
     }
-
   }
 
   @override
@@ -211,7 +193,11 @@ class HomeScreen extends State<_HomePage> {
     loadLocalStorage();
   }
 
+  String quote = 'Loading...';
+  String quoteauther = "Loading...";
+
   Future getData() async {
+
     http.Response response = await http.get(
         Uri.encodeFull("https://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en&json=?"),
         headers: {
@@ -219,25 +205,23 @@ class HomeScreen extends State<_HomePage> {
           "content-type": "application/json",
         }
     );
-
     final data = jsonDecode(response.body);
 
+    String check = data["quoteText"];
     print(data.toString());
 
-    setState(() {
-      quoteauther = data["quoteAuthor"];
-      quote = data["quoteText"];
-      addStringToLocalStorage("quote", quote);
-      addStringToLocalStorage("quoteauther", quoteauther);
-    });
+    if(check.contains("'")){
+      getData();
+    } else {
+      setState(() {
+        quoteauther = data["quoteAuthor"];
+        quote = data["quoteText"];
+        addStringToLocalStorage("quote", quote);
+        addStringToLocalStorage("quoteauther", quoteauther);
+      });
+    }
   }
 
-  //api end
-
-  //points!!!
-  //vars
-
-  //meditation timer
   int ender = 0;
   int timerDowner = 1;
 
@@ -321,8 +305,6 @@ class HomeScreen extends State<_HomePage> {
             break;
         }
 
-        coins = mypoints/2;
-
         timer.cancel();
       });
       working = false;
@@ -334,7 +316,6 @@ class HomeScreen extends State<_HomePage> {
       });
     }
   }
-
 
   @override
   Widget build(context) {
@@ -387,7 +368,6 @@ class HomeScreen extends State<_HomePage> {
                               borderRadius: BorderRadius.all(
                                   Radius.circular(borderradius))),
                         ),
-
                       ],
                     ),
                     decoration: BoxDecoration(
@@ -408,40 +388,49 @@ class HomeScreen extends State<_HomePage> {
                   ),
                 ),
               ),
-              Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    children: <Widget>[
-                      card(Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Text("\nRandom Inspire quote\n", style: TextStyle(
-                              fontWeight: FontWeight.bold)),
-                          Text(quote.toString(), style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Theme
-                                  .of(context)
-                                  .primaryColor),
-                            textAlign: TextAlign.center,),
-                          Text(quoteauther.toString(),
-                            style: TextStyle(
-                                fontSize: 12, color: Theme
+              Expanded(
+                child: Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text("\nRandom Inspire quote\n", style: TextStyle(
+                            fontWeight: FontWeight.bold)),
+                        Text(quote.toString(), style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Theme
                                 .of(context)
-                                .primaryColor),),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .center,
+                                .primaryColor),
+                          textAlign: TextAlign.center,),
+                        Text(quoteauther.toString(), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),),
+                        IconButton(
+                          onPressed: () {
+                            startSound();
+                            Share.share(
+                                "Check out this quote - '" +
+                                    quote.toString() +
+                                    "' His Auther is - " +
+                                    quoteauther.toString());
+                          },
+                          color: Theme
+                              .of(context)
+                              .primaryColor,
+                          icon: Icon(Icons.share),
+                          splashColor: Colors.transparent,
+                        ),
+                        Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
+                              Text("\nExperience", style: TextStyle(fontWeight: FontWeight.bold),),
+                              Text("\nYou've done " + mypoints.toString() + " minutes of meditation", style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),),
                               IconButton(
                                 onPressed: () {
                                   startSound();
-                                  Share.share(
-                                      "Check out this quote - '" +
-                                          quote.toString() +
-                                          "' His Auther is - " +
-                                          quoteauther.toString())
-                                },
+                                  Share.share("Look at that! I've done " + mypoints.toString() + " minutes of meditation with SimpleMeditate app");},
                                 color: Theme
                                     .of(context)
                                     .primaryColor,
@@ -449,87 +438,17 @@ class HomeScreen extends State<_HomePage> {
                                 splashColor: Colors.transparent,
                               ),
                             ],
-                          )
-                        ],
-                      ), 400),
-                      //coins
-                      card(Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment
-                                .spaceEvenly,
-                            children: <Widget>[
-                              Column(
-                                children: <Widget>[
-                                  Text("\nExperience\n", style: TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,),
-                                  Text(mypoints.toString() + " min\n",
-                                    style: TextStyle(fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme
-                                            .of(context)
-                                            .primaryColor),
-                                    textAlign: TextAlign.center,),
-                                ],
-                              ),
-                              Column(
-                                children: <Widget>[
-                                  Text("\nCoins\n", style: TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                    textAlign: TextAlign.center,),
-                                  Text((coins).toString() + " coins\n",
-                                    style: TextStyle(fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Theme
-                                            .of(context)
-                                            .primaryColor),
-                                    textAlign: TextAlign.center,),
-                                ],
-                              )
-                            ],
                           ),
-                        ],
-                      ), 400),
-
-                    ],
-                  )
+                        )
+                      ],
+                    ),
+                  ),
+                ),
               )
             ],
-          ),
-        ),
+          )
+        )
       ],
     );
   }
-
-  Widget card(Widget child, double width) {
-    return Padding(
-      padding: EdgeInsets.all(4),
-      child: Container(
-        child: Center(
-          child: Padding(
-            padding: EdgeInsets.all(8),
-            child: child,
-          ),
-        ),
-        width: width,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            new BoxShadow(
-              color: Colors.indigo[50],
-              blurRadius: 5,
-              offset: Offset(0, 0),
-            )
-          ],
-          borderRadius: BorderRadius.circular(
-              borderradius),
-        ),
-      ),
-    );
-  }
-
 }
-
-
