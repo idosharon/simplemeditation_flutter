@@ -366,7 +366,53 @@ class HomeScreen extends State<_HomePage> {
                 ),
               ),
             ),
-            
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("\nRandom Inspire quote\n", style: TextStyle(
+                        fontWeight: FontWeight.bold)),
+                      Text(quote.toString(), style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor),
+                        textAlign: TextAlign.center,),
+                      Text(quoteauther.toString(), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),),
+                      IconButton(
+                        onPressed: () {
+                          startSound();
+                          send("Check out this quote - '" + quote.toString() + "' His Auther is - " + quoteauther.toString());
+                        },
+                        color: Theme.of(context).primaryColor,
+                        icon: Icon(Icons.share),
+                        splashColor: Colors.transparent,
+                      ),
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text("\nExperience", style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("\nYou've done " + points.toString() + " minutes of meditation", style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),),
+                            IconButton(
+                              onPressed: () {
+                                startSound();
+                                send("Look at that! I've done " + points.toString() + " minutes of meditation with SimpleMeditate app");},
+                              color: Theme.of(context).primaryColor,
+                              icon: Icon(Icons.share),
+                              splashColor: Colors.transparent,
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            )
           ],
           )
         )
