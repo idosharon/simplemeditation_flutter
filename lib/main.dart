@@ -9,11 +9,11 @@ import 'package:share/share.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/services.dart';
 
-String songfile = "gong1.mp3";
+String sound = "gong1.mp3";
 AudioCache gong = new AudioCache();
-int latesI = 1260;
+int before = 1260;
 bool working = false;
-int mypoints = 0;
+int points = 0;
 
 addIntToLocalStorage(String name, int value) async {
   final prefs = await SharedPreferences.getInstance();
@@ -23,11 +23,6 @@ addIntToLocalStorage(String name, int value) async {
 addStringToLocalStorage(String name, String value) async {
   final prefs = await SharedPreferences.getInstance();
   prefs.setString(name, value);
-}
-
-addDoubleToLocalStorage(String name, double value) async {
-  final prefs = await SharedPreferences.getInstance();
-  prefs.setDouble(name, value);
 }
 
 Map<int, Color> color =
@@ -44,8 +39,6 @@ Map<int, Color> color =
   900:Color(0xFF3F51B5)
 };
 
-MaterialColor colorCustom = MaterialColor(0xFF3F51B5, color);
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
@@ -59,7 +52,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner:false,
       title: "SimpleMeditate",
       theme: ThemeData(
-        primarySwatch: colorCustom,
+        primarySwatch: MaterialColor(0xFF3F51B5, color),
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
@@ -78,7 +71,7 @@ double borderradius = 10;
 class _MyHomePageState extends State<MyHomePage> {
 
   static var logoImage = new AssetImage('assets/logo.png');
-  var logo = new ImageIcon(logoImage, color: colorCustom, size: 60,);
+  var logo = new ImageIcon(logoImage, color: Color(0xFF3F51B5), size: 60,);
 
   @override
   Widget build(BuildContext context) {
@@ -88,32 +81,32 @@ class _MyHomePageState extends State<MyHomePage> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
-        title: IconButton(icon: logo, onPressed: () => _showDialog("Settings", Column(
+        title: IconButton(icon: logo,tooltip: "Settings", onPressed: () => _showDialog("Settings", Column(
         mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text("gong Sound\n",style: TextStyle(fontWeight: FontWeight.bold)),
+            Text("gong Sound",style: TextStyle(fontWeight: FontWeight.bold)),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 FloatingActionButton(onPressed: () {
-                  songfile = "gong1.mp3";
-                  gong.play(songfile);
-                  addStringToLocalStorage("gongfile", songfile);
+                  sound = "gong1.mp3";
+                  gong.play(sound);
+                  addStringToLocalStorage("sound", sound);
                 }, elevation: 0, backgroundColor: Colors.white, child: Text("1",style: TextStyle(color: Theme.of(context).primaryColor))),
                 FloatingActionButton(onPressed: () {
-                  songfile = "gong2.mp3";
-                  gong.play(songfile);
-                  addStringToLocalStorage("gongfile", songfile);
+                  sound = "gong2.mp3";
+                  gong.play(sound);
+                  addStringToLocalStorage("sound", sound);
                 }, elevation: 0, backgroundColor: Colors.white, child: Text("2",style: TextStyle(color: Theme.of(context).primaryColor))),
                 FloatingActionButton(onPressed: () {
-                  songfile = "gong3.mp3";
-                  gong.play(songfile);
-                  addStringToLocalStorage("gongfile", songfile);
+                  sound = "gong3.mp3";
+                  gong.play(sound);
+                  addStringToLocalStorage("sound", sound);
                 }, elevation: 0, backgroundColor: Colors.white, child: Text("3",style: TextStyle(color: Theme.of(context).primaryColor))),
                 FloatingActionButton(onPressed: () {
-                  songfile = "gong4.mp3";
-                  gong.play(songfile);
-                  addStringToLocalStorage("gongfile", songfile);
+                  sound = "gong4.mp3";
+                  gong.play(sound);
+                  addStringToLocalStorage("sound", sound);
                 }, elevation: 0, backgroundColor: Colors.white, child: Text("4",style: TextStyle(color: Theme.of(context).primaryColor))),
               ],
             )
@@ -124,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _showDialog(String title, Widget content, String Buttonstring) {
+  void _showDialog(String title, Widget content, String button) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -134,7 +127,7 @@ class _MyHomePageState extends State<MyHomePage> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(borderradius))),
           actions: <Widget>[
             new FlatButton(
-              child: new Text(Buttonstring),
+              child: new Text(button),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -157,30 +150,30 @@ class HomeScreen extends State<_HomePage> {
 
     setState(() {
       if(prefs.getInt("i") == null) {
-        addIntToLocalStorage("i", latesI);
-        i = latesI;
+        addIntToLocalStorage("i", before);
+        i = before;
       } else {
         i = prefs.getInt("i");
       }
     });
 
     setState(() {
-      if(prefs.getString("gongfile") == null){
-        addStringToLocalStorage("gongfile", "songfile.mp3");
+      if(prefs.getString("sound") == null){
+        addStringToLocalStorage("sound", "sound.mp3");
       } else {
-        songfile = prefs.getString("gongfile");
+        sound = prefs.getString("sound");
       }
     });
 
 
     if(prefs.getInt("points") != null){
       setState(() {
-        mypoints = prefs.getInt("points");
+        points = prefs.getInt("points");
       });
     } else {
       setState(() {
         addIntToLocalStorage("points", 0);
-        mypoints = 0;
+        points = 0;
       });
     }
   }
@@ -226,7 +219,7 @@ class HomeScreen extends State<_HomePage> {
   int timerDowner = 1;
 
   int sec;
-  int i = latesI;
+  int i = before;
   int hours;
 
   var timer;
@@ -242,17 +235,17 @@ class HomeScreen extends State<_HomePage> {
   void reset() async {
     timer.cancel();
     setState(() {
-      i = latesI;
+      i = before;
       working = false;
     });
   }
 
   void pausePlayer(Timer timer) async {
     print("End");
-    gong.play(songfile);
+    gong.play(sound);
     Future.delayed(Duration(milliseconds: 1500), sound2);
     setState(() {
-      this.i = latesI;
+      this.i = before;
       timer.cancel();
     });
     working = false;
@@ -260,23 +253,19 @@ class HomeScreen extends State<_HomePage> {
 
   void startSound() {
     if (working) return;
-    gong.play(songfile);
+    gong.play(sound);
   }
 
   void sound2() {
-    gong.play(songfile);
-    Future.delayed(Duration(milliseconds: 1500), sound3);
-  }
-
-  void sound3() {
-    gong.play(songfile);
+    gong.play(sound);
+    Future.delayed(Duration(milliseconds: 1500), () => gong.play(sound));
   }
 
   void callback(Timer timer) async {
     final prefs = await SharedPreferences.getInstance();
     if (i == ender) {
       print("End");
-      gong.play(songfile);
+      gong.play(sound);
       Future.delayed(Duration(milliseconds: 1500), sound2);
 
       setState(() {
@@ -284,24 +273,24 @@ class HomeScreen extends State<_HomePage> {
 
         switch (prefs.getInt("i")) {
           case 60:
-            mypoints++;
-            addIntToLocalStorage("points", mypoints);
+            points++;
+            addIntToLocalStorage("points", points);
             break;
           case 420:
-            mypoints += 7;
-            addIntToLocalStorage("points", mypoints);
+            points += 7;
+            addIntToLocalStorage("points", points);
             break;
           case 1260:
-            mypoints += 21;
-            addIntToLocalStorage("points", mypoints);
+            points += 21;
+            addIntToLocalStorage("points", points);
             break;
           case 2520:
-            mypoints += 42;
-            addIntToLocalStorage("points", mypoints);
+            points += 42;
+            addIntToLocalStorage("points", points);
             break;
           case 3780:
-            mypoints += 63;
-            addIntToLocalStorage("points", mypoints);
+            points += 63;
+            addIntToLocalStorage("points", points);
             break;
         }
 
@@ -317,135 +306,114 @@ class HomeScreen extends State<_HomePage> {
     }
   }
 
+  void send(String text){
+    Share.share(text);
+  }
+
   @override
   Widget build(context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              Expanded(
-                child: GestureDetector(
-                  onTap: () {
-                    if (working) return;
-                    gong.play(songfile);
-                    setState(() {
-                      this.i = {
-                        2520: 3780,
-                        3780: 60,
-                        60: 420,
-                        420: 1260,
-                        1260: 2520
-                      }[this.i];
-                      addIntToLocalStorage("i", this.i);
-                      latesI = this.i;
-                    });
-                  },
-                  child: Container(
-                    width: 1000,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Text(((i / 60).floor()).toString().padLeft(2, '0') +
-                            ":" + (i % 60).toString().padLeft(2, '0'),
-                            style: TextStyle(fontSize: 70,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                        RaisedButton(
-                          onPressed: () {
-                            startTimer();
-                            startSound();
-                          },
-                          color: Colors.white,
-                          child: Text(
-                            working ? "Stop" : "Start", style: TextStyle(
-                              fontSize: 15, color: working ? Colors.red : Theme
-                              .of(context)
-                              .primaryColor),),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                  Radius.circular(borderradius))),
-                        ),
-                      ],
-                    ),
-                    decoration: BoxDecoration(
-                      boxShadow: [
-                        new BoxShadow(
-                          color: Colors.indigo[50],
-                          blurRadius: 5,
-                          offset: Offset(0, 0),
-                        )
-                      ],
-                      borderRadius: BorderRadius.only(bottomRight: Radius.circular(borderradius), bottomLeft: Radius.circular(borderradius)),
-                      image: DecorationImage(
-                        fit: BoxFit.cover,
-                        image: NetworkImage(
-                            "https://source.unsplash.com/collection/3330448/1600x900"),
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: <Widget>[
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  if (working) return;
+                  gong.play(sound);
+                  setState(() {
+                    this.i = {2520: 3780, 3780: 60, 60: 420, 420: 1260, 1260: 2520
+                    }[this.i];
+                    addIntToLocalStorage("i", this.i);
+                    before = this.i;
+                  });
+                },
+                child: Container(
+                  width: 1000,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Text(((i / 60).floor()).toString().padLeft(2, '0') + ":" + (i % 60).toString().padLeft(2, '0'), style: TextStyle(fontSize: 70, fontWeight: FontWeight.bold, color: Colors.white)),
+                      RaisedButton(
+                        onPressed: () {
+                          startTimer();
+                          startSound();
+                        },
+                        color: Colors.white,
+                        child: Text(working ? "Stop" : "Start", style: TextStyle(fontSize: 15, color: working ? Colors.red : Theme.of(context).primaryColor),),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(Radius.circular(borderradius))),
                       ),
+                    ],
+                  ),
+                  decoration: BoxDecoration(
+                    boxShadow: [
+                      new BoxShadow(
+                        color: Colors.indigo[50],
+                        blurRadius: 5,
+                        offset: Offset(0, 0),
+                      )
+                    ],
+                    borderRadius: BorderRadius.only(bottomRight: Radius.circular(borderradius), bottomLeft: Radius.circular(borderradius)),
+                    image: DecorationImage(
+                      fit: BoxFit.cover,
+                      image: NetworkImage("https://source.unsplash.com/collection/3330448/1600x900"),
                     ),
                   ),
                 ),
               ),
-              Expanded(
-                child: Center(
-                  child: Padding(
-                    padding: EdgeInsets.all(8),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text("\nRandom Inspire quote\n", style: TextStyle(
-                            fontWeight: FontWeight.bold)),
-                        Text(quote.toString(), style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Theme
-                                .of(context)
-                                .primaryColor),
-                          textAlign: TextAlign.center,),
-                        Text(quoteauther.toString(), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),),
-                        IconButton(
-                          onPressed: () {
-                            startSound();
-                            Share.share(
-                                "Check out this quote - '" +
-                                    quote.toString() +
-                                    "' His Auther is - " +
-                                    quoteauther.toString());
-                          },
-                          color: Theme
-                              .of(context)
-                              .primaryColor,
-                          icon: Icon(Icons.share),
-                          splashColor: Colors.transparent,
+            ),
+            Expanded(
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("\nRandom Inspire quote\n", style: TextStyle(
+                        fontWeight: FontWeight.bold)),
+                      Text(quote.toString(), style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor),
+                        textAlign: TextAlign.center,),
+                      Text(quoteauther.toString(), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor),),
+                      IconButton(
+                        onPressed: () {
+                          startSound();
+                          send("Check out this quote - '" + quote.toString() + "' His Auther is - " + quoteauther.toString());
+                        },
+                        color: Theme.of(context).primaryColor,
+                        icon: Icon(Icons.share),
+                        splashColor: Colors.transparent,
+                      ),
+                      Container(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text("\nExperience", style: TextStyle(fontWeight: FontWeight.bold),),
+                            Text("\nYou've done " + points.toString() + " minutes of meditation", style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),),
+                            IconButton(
+                              onPressed: () {
+                                startSound();
+                                send("Look at that! I've done " + points.toString() + " minutes of meditation with SimpleMeditate app");},
+                              color: Theme.of(context).primaryColor,
+                              icon: Icon(Icons.share),
+                              splashColor: Colors.transparent,
+                            ),
+                          ],
                         ),
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text("\nExperience", style: TextStyle(fontWeight: FontWeight.bold),),
-                              Text("\nYou've done " + mypoints.toString() + " minutes of meditation", style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold,color: Theme.of(context).primaryColor),),
-                              IconButton(
-                                onPressed: () {
-                                  startSound();
-                                  Share.share("Look at that! I've done " + mypoints.toString() + " minutes of meditation with SimpleMeditate app");},
-                                color: Theme
-                                    .of(context)
-                                    .primaryColor,
-                                icon: Icon(Icons.share),
-                                splashColor: Colors.transparent,
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
+                      )
+                    ],
                   ),
                 ),
-              )
-            ],
+              ),
+            )
+          ],
           )
         )
       ],
